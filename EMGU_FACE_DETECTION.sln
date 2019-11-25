@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29230.47
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EMGU_FACE_DETECTION", "EMGU_FACE_DETECTION\EMGU_FACE_DETECTION.csproj", "{BC8B0BE5-1C58-4AB8-AE4B-71EB990CAEFC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BC8B0BE5-1C58-4AB8-AE4B-71EB990CAEFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC8B0BE5-1C58-4AB8-AE4B-71EB990CAEFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC8B0BE5-1C58-4AB8-AE4B-71EB990CAEFC}.Debug|x86.ActiveCfg = Debug|x86
+		{BC8B0BE5-1C58-4AB8-AE4B-71EB990CAEFC}.Debug|x86.Build.0 = Debug|x86
+		{BC8B0BE5-1C58-4AB8-AE4B-71EB990CAEFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC8B0BE5-1C58-4AB8-AE4B-71EB990CAEFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC8B0BE5-1C58-4AB8-AE4B-71EB990CAEFC}.Release|x86.ActiveCfg = Release|x86
+		{BC8B0BE5-1C58-4AB8-AE4B-71EB990CAEFC}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DF5A6478-11EF-4F0E-AF43-65C7E6AE5D61}
+	EndGlobalSection
+EndGlobal
