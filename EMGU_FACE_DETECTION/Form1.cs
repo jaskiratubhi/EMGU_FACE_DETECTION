@@ -6,6 +6,8 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO.Ports;
+using System.Threading;
 using System.Windows.Forms;
 using AForge.Video;
 using AForge.Video.DirectShow;
@@ -14,11 +16,36 @@ using Emgu.CV.Structure;
 
 namespace EMGU_FACE_DETECTION
 {
+
     public partial class Form1 : Form
     {
+        //Variables
+        const int ON = 1;
+        const int OFF = 0;
+        int motorStatus = OFF;
+        bool endstop1Tripped = false;
+        bool endstop2Tripped = false;
+        //Data packet
+        const int START_BYTE = 255;     //byte 1
+        int commandByte = 0;            //byte 2
+        int dataByteHigh = 0;           //byte 3 
+        int dataByteLow = 0;            //byte 4
+        int endByte = 0;                //byte 5
         public Form1()
         {
             InitializeComponent();
+            this.Load += Form1_Load;
+            //Set trackbar details
+            verticalPositionBar.Maximum = 100;
+            verticalPositionBar.TickFrequency = 1;
+            verticalPositionBar.LargeChange = 5;
+            verticalPositionBar.SmallChange = 1;
+            verticalPositionBar.Value = 0;
+            horizontalPositionBar.Maximum = 100;
+            horizontalPositionBar.TickFrequency = 1;
+            horizontalPositionBar.LargeChange = 5;
+            horizontalPositionBar.SmallChange = 1;
+            horizontalPositionBar.Value = 50;
         }
         FilterInfoCollection filter;
         VideoCaptureDevice device;
@@ -27,6 +54,10 @@ namespace EMGU_FACE_DETECTION
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            var ports = SerialPort.GetPortNames();
+            COMPORTbox.DataSource = ports;
+
+            //Video filtering
             filter = new FilterInfoCollection(FilterCategory.VideoInputDevice);
             foreach (FilterInfo device in filter)
             {
@@ -72,18 +103,115 @@ namespace EMGU_FACE_DETECTION
         {
             if (device.IsRunning)
                 device.Stop();
+            motorStatus = OFF;
+            //Turn off solenoid
+            sendMotorCommand();
+            serialPort1.Close();
         }
 
         private void Timer1_Tick(object sender, EventArgs e)
         {
+            //Update ports
+            var ports = SerialPort.GetPortNames();
+            COMPORTbox.DataSource = ports;
+
+            //Update XY value display
             txtX.Text = xval.ToString();
             txtY.Text = yval.ToString();
+
+            //Update endstop information
+            rotationEndStopTxt.Text = endstop1Tripped.ToString();
+            verticalEndStopTxt.Text = endstop2Tripped.ToString();
+            //Display X and Y coordinates
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
             if (device.IsRunning)
                 device.Stop();
+        }
+
+        private void BtnCOMConnect_Click(object sender, EventArgs e)
+        {
+            try //if the COM port disappears between initialization and click
+            {
+                //Connect if no ports are opened
+                if (!serialPort1.IsOpen)
+                {
+                    string portID = COMPORTbox.SelectedValue.ToString();
+                    serialPort1.PortName = portID;
+                    serialPort1.Open();
+                    btnCOMConnect.Text = "Disconnect";
+                    bool keepGoing = true;
+                }
+                else
+                {
+                    //Disconnect if port is opened
+                    serialPort1.Close();
+                    btnCOMConnect.Text = "Connect";
+                }
+            }
+            catch (Exception myError)
+            {
+                MessageBox.Show(myError.ToString());
+            }
+        }
+
+        private void MotorONbtn_Click(object sender, EventArgs e)
+        {
+            //ON command to motors
+            motorStatus = ON;
+            sendMotorCommand();
+        }
+
+        private void MotorOFFbtn_Click(object sender, EventArgs e)
+        {
+            //OFF command to motors
+            motorStatus = OFF;
+            sendMotorCommand();
+        }
+
+        private void sendMotorCommand()
+        {
+            if (motorStatus == ON)
+            {
+                byte[] TxBytes = new Byte[5];
+                TxBytes[0] = Convert.ToByte(START_BYTE);
+                TxBytes[1] = Convert.ToByte(commandByte);
+                TxBytes[2] = Convert.ToByte(dataByteHigh);
+                TxBytes[3] = Convert.ToByte(dataByteLow);
+                TxBytes[4] = Convert.ToByte(endByte);
+
+                //Sends command packet to serial port
+                if (serialPort1.IsOpen)
+                {
+                    serialPort1.Write(TxBytes, 0, 1);
+                    Thread.Sleep(10);
+                    serialPort1.Write(TxBytes, 1, 1);
+                    Thread.Sleep(10);
+                    serialPort1.Write(TxBytes, 2, 1);
+                    Thread.Sleep(10);
+                    serialPort1.Write(TxBytes, 3, 1);
+                    Thread.Sleep(10);
+                    serialPort1.Write(TxBytes, 4, 1);
+                    Thread.Sleep(10);
+                }
+            }
+        }
+
+        private void FireLeftbtn_Click(object sender, EventArgs e)
+        {
+            //Fire left solenoid
+        }
+
+        private void FireRightbtn_Click(object sender, EventArgs e)
+        {
+            //Fire right solenoid
+        }
+
+        private void Homebtn_Click(object sender, EventArgs e)
+        {
+            //Send home command
         }
     }
 }
