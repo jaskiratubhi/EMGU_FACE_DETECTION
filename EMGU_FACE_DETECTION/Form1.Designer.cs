@@ -171,21 +171,26 @@
             // 
             // verticalPositionBar
             // 
+            this.verticalPositionBar.Enabled = false;
             this.verticalPositionBar.Location = new System.Drawing.Point(1329, 165);
             this.verticalPositionBar.Name = "verticalPositionBar";
             this.verticalPositionBar.Orientation = System.Windows.Forms.Orientation.Vertical;
             this.verticalPositionBar.Size = new System.Drawing.Size(69, 359);
             this.verticalPositionBar.TabIndex = 36;
+            this.verticalPositionBar.ValueChanged += new System.EventHandler(this.VerticalPositionBar_ValueChanged);
             // 
             // horizontalPositionBar
             // 
+            this.horizontalPositionBar.Enabled = false;
             this.horizontalPositionBar.Location = new System.Drawing.Point(1133, 543);
             this.horizontalPositionBar.Name = "horizontalPositionBar";
             this.horizontalPositionBar.Size = new System.Drawing.Size(434, 69);
             this.horizontalPositionBar.TabIndex = 35;
+            this.horizontalPositionBar.ValueChanged += new System.EventHandler(this.HorizontalPositionBar_ValueChanged);
             // 
             // fireRightbtn
             // 
+            this.fireRightbtn.Enabled = false;
             this.fireRightbtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 22F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.fireRightbtn.Location = new System.Drawing.Point(1421, 237);
             this.fireRightbtn.Name = "fireRightbtn";
@@ -197,6 +202,7 @@
             // 
             // fireLeftbtn
             // 
+            this.fireLeftbtn.Enabled = false;
             this.fireLeftbtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 22F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.fireLeftbtn.Location = new System.Drawing.Point(1092, 237);
             this.fireLeftbtn.Name = "fireLeftbtn";
@@ -252,6 +258,7 @@
             // 
             // homebtn
             // 
+            this.homebtn.Enabled = false;
             this.homebtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.homebtn.Location = new System.Drawing.Point(1226, 656);
             this.homebtn.Name = "homebtn";

@@ -22,9 +22,26 @@ namespace EMGU_FACE_DETECTION
         //Variables
         const int ON = 1;
         const int OFF = 0;
-        int motorStatus = OFF;
+        //commands
+        //Motor 1 = rotation.   Motor 2 = up/down
+
+        const int M1LEFT = 1;   //Motor 1, left
+        const int M1RIGHT = 2;  //Motor 1, right
+        const int M2UP = 3;     //Motor 2, up
+        const int M2DOWN = 4;   //Motor 2, down
+        const int FIRELEFTSOLENOID = 5;     //Fire Left Solenoid
+        const int FIRERIGHTSOLENOID = 6;    //Fire Right Solenoid
+        const int M1STOPPED = 7;   //Motor 1 on but stopped
+        const int M2STOPPED = 8;   //Motor 2 on but stopped
+        const int MOTORSOFF = 9;  //Emergency Power shutdown(Both Motors)
+        const int HOME = 10;
+
+        int M1status = OFF;
+        int M2status = OFF;
         bool endstop1Tripped = false;
         bool endstop2Tripped = false;
+        int verticalValue;
+        int horizontalValue;
         //Data packet
         const int START_BYTE = 255;     //byte 1
         int commandByte = 0;            //byte 2
@@ -103,9 +120,8 @@ namespace EMGU_FACE_DETECTION
         {
             if (device.IsRunning)
                 device.Stop();
-            motorStatus = OFF;
             //Turn off solenoid
-            sendMotorCommand();
+            sendMotorCommand(MOTORSOFF);
             serialPort1.Close();
         }
 
@@ -123,6 +139,8 @@ namespace EMGU_FACE_DETECTION
             rotationEndStopTxt.Text = endstop1Tripped.ToString();
             verticalEndStopTxt.Text = endstop2Tripped.ToString();
             //Display X and Y coordinates
+            verticalValue = verticalPositionBar.Value;
+            horizontalValue = horizontalPositionBar.Value;
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
@@ -160,41 +178,59 @@ namespace EMGU_FACE_DETECTION
         private void MotorONbtn_Click(object sender, EventArgs e)
         {
             //ON command to motors
-            motorStatus = ON;
-            sendMotorCommand();
+            //if(serialPort1.IsOpen)
+            {
+                sendMotorCommand(M1STOPPED);
+                M1status = ON;
+                sendMotorCommand(M2STOPPED);
+                M2status = ON;
+                horizontalPositionBar.Enabled = true;
+                verticalPositionBar.Enabled = true;
+                homebtn.Enabled = true;
+                fireLeftbtn.Enabled = true;
+                fireRightbtn.Enabled = true;
+            }
+
         }
 
         private void MotorOFFbtn_Click(object sender, EventArgs e)
         {
             //OFF command to motors
-            motorStatus = OFF;
-            sendMotorCommand();
+            sendMotorCommand(MOTORSOFF);
+            M1status = OFF;
+            M2status = OFF;
+            horizontalPositionBar.Enabled = false;
+            verticalPositionBar.Enabled = false;
+            homebtn.Enabled = false;
+            fireLeftbtn.Enabled = false;
+            fireRightbtn.Enabled = false;
         }
 
-        private void sendMotorCommand()
+        private void sendMotorCommand(int cmd)
         {
-            if (motorStatus == ON)
+            commandByte = cmd;
+            if (M1status == ON && M2status == ON)
             {
-                byte[] TxBytes = new Byte[5];
-                TxBytes[0] = Convert.ToByte(START_BYTE);
-                TxBytes[1] = Convert.ToByte(commandByte);
-                TxBytes[2] = Convert.ToByte(dataByteHigh);
-                TxBytes[3] = Convert.ToByte(dataByteLow);
-                TxBytes[4] = Convert.ToByte(endByte);
+                byte[] TxBytes = new Byte[1];
+                TxBytes[0] = Convert.ToByte(commandByte);
+                //TxBytes[1] = Convert.ToByte(commandByte);
+                //TxBytes[2] = Convert.ToByte(dataByteHigh);
+                //TxBytes[3] = Convert.ToByte(dataByteLow);
+                //TxBytes[4] = Convert.ToByte(endByte);
 
                 //Sends command packet to serial port
                 if (serialPort1.IsOpen)
                 {
                     serialPort1.Write(TxBytes, 0, 1);
-                    Thread.Sleep(10);
-                    serialPort1.Write(TxBytes, 1, 1);
-                    Thread.Sleep(10);
-                    serialPort1.Write(TxBytes, 2, 1);
-                    Thread.Sleep(10);
-                    serialPort1.Write(TxBytes, 3, 1);
-                    Thread.Sleep(10);
-                    serialPort1.Write(TxBytes, 4, 1);
-                    Thread.Sleep(10);
+                    //Thread.Sleep(10);
+                    //serialPort1.Write(TxBytes, 1, 1);
+                    //Thread.Sleep(10);
+                    //serialPort1.Write(TxBytes, 2, 1);
+                    //Thread.Sleep(10);
+                    //serialPort1.Write(TxBytes, 3, 1);
+                    //Thread.Sleep(10);
+                    //serialPort1.Write(TxBytes, 4, 1);
+                    //Thread.Sleep(10);
                 }
             }
         }
@@ -202,16 +238,56 @@ namespace EMGU_FACE_DETECTION
         private void FireLeftbtn_Click(object sender, EventArgs e)
         {
             //Fire left solenoid
+            sendMotorCommand(FIRELEFTSOLENOID);
         }
 
         private void FireRightbtn_Click(object sender, EventArgs e)
         {
             //Fire right solenoid
+            sendMotorCommand(FIRERIGHTSOLENOID);
         }
 
         private void Homebtn_Click(object sender, EventArgs e)
         {
             //Send home command
+            if(M1status ==ON && M2status == ON)
+            {
+                sendMotorCommand(HOME);
+                Thread.Sleep(100);
+                verticalPositionBar.Value = 0;
+                horizontalPositionBar.Value = 50;
+            }
+
+        }
+
+        private void VerticalPositionBar_ValueChanged(object sender, EventArgs e)
+        {
+            if(M2status == ON)
+            {
+                if(verticalPositionBar.Value > verticalValue) //Add an && for being at max?
+                {
+                    sendMotorCommand(M2UP);
+                }
+                else if (verticalPositionBar.Value <= verticalValue && endstop2Tripped != true)
+                {
+                    sendMotorCommand(M2DOWN);
+                }
+            }
+        }
+
+        private void HorizontalPositionBar_ValueChanged(object sender, EventArgs e)
+        {
+            if (M1status == ON)
+            {
+                if (horizontalPositionBar.Value > horizontalValue) //Add an && for being at max?
+                {
+                    sendMotorCommand(M1RIGHT);
+                }
+                else if (horizontalPositionBar.Value <= horizontalValue && endstop1Tripped != true)
+                {
+                    sendMotorCommand(M1LEFT);
+                }
+            }
         }
     }
 }
