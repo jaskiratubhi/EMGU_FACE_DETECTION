@@ -22,12 +22,13 @@ namespace EMGU_FACE_DETECTION
         //Variables
         const int ON = 1;
         const int OFF = 0;
+        const int Xcenter = 300;
         //commands
         //Motor 1 = rotation.   Motor 2 = up/down
 
         const int M1LEFT = 1;   //Motor 1, left
-        const int M1RIGHT = 2;  //Motor 1, right
-        const int M2UP = 3;     //Motor 2, up
+        const int M1RIGHT = 3;  //Motor 1, right
+        const int M2UP = 2;     //Motor 2, up
         const int M2DOWN = 4;   //Motor 2, down
         const int FIRELEFTSOLENOID = 5;     //Fire Left Solenoid
         const int FIRERIGHTSOLENOID = 6;    //Fire Right Solenoid
@@ -43,11 +44,11 @@ namespace EMGU_FACE_DETECTION
         int verticalValue;
         int horizontalValue;
         //Data packet
-        const int START_BYTE = 255;     //byte 1
-        int commandByte = 0;            //byte 2
-        int dataByteHigh = 0;           //byte 3 
-        int dataByteLow = 0;            //byte 4
-        int endByte = 0;                //byte 5
+       // const int START_BYTE = 255;     //byte 1
+       // int commandByte = 0;            //byte 2
+        //int dataByteHigh = 0;           //byte 3 
+        //int dataByteLow = 0;            //byte 4
+        //int endByte = 0;                //byte 5
         public Form1()
         {
             InitializeComponent();
@@ -141,6 +142,30 @@ namespace EMGU_FACE_DETECTION
             //Display X and Y coordinates
             verticalValue = verticalPositionBar.Value;
             horizontalValue = horizontalPositionBar.Value;
+
+            //Make movement decisions
+            if(xval >0)
+            {
+                if (xval > Xcenter + 50)
+                {
+                    M1status = ON;
+                    M2status = ON;
+                    sendMotorCommand(1);
+                }
+                else if (xval <= Xcenter - 50)
+                {
+                    M1status = ON;
+                    M2status = ON;
+                    sendMotorCommand(3);
+                }
+                else
+                {
+                    M1status = ON;
+                    M2status = ON;
+                    sendMotorCommand(9);
+                }
+            }
+
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
@@ -178,12 +203,14 @@ namespace EMGU_FACE_DETECTION
         private void MotorONbtn_Click(object sender, EventArgs e)
         {
             //ON command to motors
-            //if(serialPort1.IsOpen)
+            if(serialPort1.IsOpen)
             {
-                sendMotorCommand(M1STOPPED);
                 M1status = ON;
-                sendMotorCommand(M2STOPPED);
                 M2status = ON;
+                sendMotorCommand(M1STOPPED);
+                //sendMotorCommand(1);              
+                //sendMotorCommand(M2STOPPED);
+                
                 horizontalPositionBar.Enabled = true;
                 verticalPositionBar.Enabled = true;
                 homebtn.Enabled = true;
@@ -208,7 +235,7 @@ namespace EMGU_FACE_DETECTION
 
         private void sendMotorCommand(int cmd)
         {
-            commandByte = cmd;
+            int commandByte = cmd;
             if (M1status == ON && M2status == ON)
             {
                 byte[] TxBytes = new Byte[1];
@@ -288,6 +315,20 @@ namespace EMGU_FACE_DETECTION
                     sendMotorCommand(M1LEFT);
                 }
             }
+        }
+
+        private void Button1_Click(object sender, EventArgs e)
+        {
+            M1status = ON;
+            M2status = ON;
+            sendMotorCommand(M1LEFT);
+        }
+
+        private void Button2_Click(object sender, EventArgs e)
+        {
+            M1status = ON;
+            //M2status = ON;
+            sendMotorCommand(M1RIGHT);
         }
     }
 }
