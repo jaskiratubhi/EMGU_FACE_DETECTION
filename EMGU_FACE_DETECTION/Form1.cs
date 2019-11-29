@@ -23,6 +23,7 @@ namespace EMGU_FACE_DETECTION
         const int ON = 1;
         const int OFF = 0;
         const int Xcenter = 300;
+        const int Ycenter = 200;
         //commands
         //Motor 1 = rotation.   Motor 2 = up/down
 
@@ -129,8 +130,8 @@ namespace EMGU_FACE_DETECTION
         private void Timer1_Tick(object sender, EventArgs e)
         {
             //Update ports
-            var ports = SerialPort.GetPortNames();
-            COMPORTbox.DataSource = ports;
+           // var ports = SerialPort.GetPortNames();
+           // COMPORTbox.DataSource = ports;
 
             //Update XY value display
             txtX.Text = xval.ToString();
@@ -157,6 +158,28 @@ namespace EMGU_FACE_DETECTION
                     M1status = ON;
                     M2status = ON;
                     sendMotorCommand(3);
+                }
+                else
+                {
+                    M1status = ON;
+                    M2status = ON;
+                    sendMotorCommand(9);
+                }
+            }
+            //Y movements
+            if (yval > 0)
+            {
+                if (yval > Ycenter + 20)
+                {
+                    M1status = ON;
+                    M2status = ON;
+                    sendMotorCommand(2);
+                }
+                else if (yval <= Ycenter - 20)
+                {
+                    M1status = ON;
+                    M2status = ON;
+                    sendMotorCommand(4);
                 }
                 else
                 {
@@ -329,6 +352,18 @@ namespace EMGU_FACE_DETECTION
             M1status = ON;
             //M2status = ON;
             sendMotorCommand(M1RIGHT);
+        }
+
+        private void Button5_Click(object sender, EventArgs e)
+        {
+            M2status = ON;
+            sendMotorCommand(M2UP);
+        }
+
+        private void Button4_Click(object sender, EventArgs e)
+        {
+            M2status = ON;
+            sendMotorCommand(M2DOWN);
         }
     }
 }

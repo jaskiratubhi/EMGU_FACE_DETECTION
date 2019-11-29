@@ -57,6 +57,9 @@
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
+            this.button4 = new System.Windows.Forms.Button();
+            this.button5 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.videoFeed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.verticalPositionBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.horizontalPositionBar)).BeginInit();
@@ -262,11 +265,11 @@
             // 
             this.homebtn.Enabled = false;
             this.homebtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.homebtn.Location = new System.Drawing.Point(1402, 668);
+            this.homebtn.Location = new System.Drawing.Point(1402, 742);
             this.homebtn.Name = "homebtn";
-            this.homebtn.Size = new System.Drawing.Size(117, 76);
+            this.homebtn.Size = new System.Drawing.Size(148, 76);
             this.homebtn.TabIndex = 45;
-            this.homebtn.Text = "HOME";
+            this.homebtn.Text = "HOME Rotation";
             this.homebtn.UseVisualStyleBackColor = true;
             this.homebtn.Click += new System.EventHandler(this.Homebtn_Click);
             // 
@@ -324,11 +327,47 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.Button2_Click);
             // 
+            // button3
+            // 
+            this.button3.Enabled = false;
+            this.button3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button3.Location = new System.Drawing.Point(1556, 742);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(148, 76);
+            this.button3.TabIndex = 48;
+            this.button3.Text = "HOME Z";
+            this.button3.UseVisualStyleBackColor = true;
+            // 
+            // button4
+            // 
+            this.button4.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button4.Location = new System.Drawing.Point(1477, 671);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(116, 57);
+            this.button4.TabIndex = 50;
+            this.button4.Text = "DOWN";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.Button4_Click);
+            // 
+            // button5
+            // 
+            this.button5.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button5.Location = new System.Drawing.Point(1477, 608);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(116, 57);
+            this.button5.TabIndex = 49;
+            this.button5.Text = "UP";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.Button5_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1800, 830);
+            this.Controls.Add(this.button4);
+            this.Controls.Add(this.button5);
+            this.Controls.Add(this.button3);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.homebtn);
@@ -399,6 +438,9 @@
         private System.IO.Ports.SerialPort serialPort1;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button button5;
     }
 }
 
