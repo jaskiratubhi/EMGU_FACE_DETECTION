@@ -13,7 +13,8 @@ using AForge.Video;
 using AForge.Video.DirectShow;
 using Emgu.CV;
 using Emgu.CV.Structure;
-
+using System.Collections.Concurrent;
+using System.Drawing;
 namespace EMGU_FACE_DETECTION
 {
 
@@ -37,16 +38,23 @@ namespace EMGU_FACE_DETECTION
         const int M2STOPPED = 8;   //Motor 2 on but stopped
         const int MOTORSOFF = 9;  //Emergency Power shutdown(Both Motors)
         const int HOME = 10;
-
+        const int SPEED_THRESHOLD = 20; // Minimum person's speed threshold
         int M1status = OFF;
         int M2status = OFF;
         bool endstop1Tripped = false;
         bool endstop2Tripped = false;
         int verticalValue;
         int horizontalValue;
+        // Queue for holding speed of person over time
+        ConcurrentQueue<int> speed = new ConcurrentQueue<int>();
+        int current_speed;
+        int old_distance = 0;
+        int frame_count = 0;
+        bool timer_flag = false;
+        const int FRAME_AVERAGE= 5;
         //Data packet
-       // const int START_BYTE = 255;     //byte 1
-       // int commandByte = 0;            //byte 2
+        // const int START_BYTE = 255;     //byte 1
+        // int commandByte = 0;            //byte 2
         //int dataByteHigh = 0;           //byte 3 
         //int dataByteLow = 0;            //byte 4
         //int endByte = 0;                //byte 5
@@ -96,26 +104,54 @@ namespace EMGU_FACE_DETECTION
         static readonly CascadeClassifier cascadeClassifier = new CascadeClassifier("haarcascade_frontalface_default.xml");
         private void Device_NewFrame(object sender, NewFrameEventArgs eventArgs)
         {
-            Bitmap bitmap = (Bitmap)eventArgs.Frame.Clone();
-            Image<Bgr, byte> greyImage = new Image<Bgr, byte>(bitmap);
-            Rectangle[] rectangles = cascadeClassifier.DetectMultiScale(greyImage,1.2,5);
-            if (rectangles.Length > 0)
+            if (frame_count < 1)
             {
-                xval = rectangles[0].X + rectangles[0].Width / 2;
-                yval = rectangles[0].Y + rectangles[0].Height / 2;
-               
+                frame_count++;
             }
-            foreach (Rectangle rectangle in rectangles)
+
+            else
             {
-                using(Graphics graphics = Graphics.FromImage(bitmap))
+                frame_count = 0;
+                Bitmap bitmap = (Bitmap)eventArgs.Frame.Clone();
+                Image<Bgr, byte> greyImage = new Image<Bgr, byte>(bitmap);
+                Rectangle[] rectangles = cascadeClassifier.DetectMultiScale(greyImage, 1.2, 5);
+                if (rectangles.Length > 0)
                 {
-                    using(Pen pen=new Pen(Color.Blue, 5))
+                    xval = rectangles[0].X + rectangles[0].Width / 2;
+                    yval = rectangles[0].Y + rectangles[0].Height / 2;
+
+                }
+                else if (rectangles.Length == 0)
+                {
+                    xval = 0;
+                    yval = 0;
+                    Graphics graphics = Graphics.FromImage(bitmap);
+                    Pen pen1 = new Pen(Color.Red, 15);
+
+                    graphics.DrawRectangle(pen1, 10, 10, 100, 50);
+                }
+                if (rectangles.Length > 1)
+                {
+                    xval = 0;
+                    yval = 0;
+                    Graphics graphics = Graphics.FromImage(bitmap);
+                    Pen pen1 = new Pen(Color.Green, 15);
+
+                    graphics.DrawRectangle(pen1, 10, 10, 100, 50);
+
+                }
+                foreach (Rectangle rectangle in rectangles)
+                {
+                    using (Graphics graphics = Graphics.FromImage(bitmap))
                     {
-                        graphics.DrawRectangle(pen, rectangle);
+                        using (Pen pen = new Pen(Color.Blue, 5))
+                        {
+                            graphics.DrawRectangle(pen, rectangle);
+                        }
                     }
                 }
+                videoFeed.Image = bitmap;
             }
-            videoFeed.Image = bitmap;
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -129,9 +165,11 @@ namespace EMGU_FACE_DETECTION
 
         private void Timer1_Tick(object sender, EventArgs e)
         {
+            int new_distance;
+            int data;
             //Update ports
-           // var ports = SerialPort.GetPortNames();
-           // COMPORTbox.DataSource = ports;
+            // var ports = SerialPort.GetPortNames();
+            // COMPORTbox.DataSource = ports;
 
             //Update XY value display
             txtX.Text = xval.ToString();
@@ -145,15 +183,15 @@ namespace EMGU_FACE_DETECTION
             horizontalValue = horizontalPositionBar.Value;
 
             //Make movement decisions
-            if(xval >0)
+            if (xval > 0)
             {
-                if (xval > Xcenter + 50)
+                if (xval > Xcenter + 30)
                 {
                     M1status = ON;
                     M2status = ON;
                     sendMotorCommand(1);
                 }
-                else if (xval <= Xcenter - 50)
+                else if (xval <= Xcenter - 30)
                 {
                     M1status = ON;
                     M2status = ON;
@@ -169,13 +207,13 @@ namespace EMGU_FACE_DETECTION
             //Y movements
             if (yval > 0)
             {
-                if (yval > Ycenter + 20)
+                if (yval < Ycenter - 10)
                 {
                     M1status = ON;
                     M2status = ON;
                     sendMotorCommand(2);
                 }
-                else if (yval <= Ycenter - 20)
+                else if (yval >= Ycenter + 10)
                 {
                     M1status = ON;
                     M2status = ON;
@@ -187,6 +225,51 @@ namespace EMGU_FACE_DETECTION
                     M2status = ON;
                     sendMotorCommand(9);
                 }
+            }
+            if (xval > 0 && yval > 0)
+            {
+
+                new_distance = (10 * (Convert.ToInt32(xval / 10))) ^ 2 + (10 * (Convert.ToInt32((yval / 10)))) ^ 2;
+                current_speed = new_distance - old_distance;
+                //speed.Enqueue((new_distance - old_distance));
+                txtSpeed.Text = current_speed.ToString();
+                listBoxTest.Items.Add(current_speed.ToString());
+                //listBoxTest.SelectedIndex = listBoxTest.Items.Count - 1;
+                old_distance = new_distance;
+                if (current_speed < SPEED_THRESHOLD)
+                {
+                    speed.Enqueue(current_speed);
+                    if (speed.Count > FRAME_AVERAGE)
+                    {
+                        if (speed.Average() < SPEED_THRESHOLD)
+                        {
+                            txtTest.Text = "Target Locked";
+                           
+                        }
+                        else
+                        {
+                            txtTest.Text = " ";
+                        }
+                        while(speed.Count> FRAME_AVERAGE)
+                        {
+                            speed.TryDequeue(out data);
+                        }
+                       
+                    }
+                    else
+                    {
+                        txtTest.Text = " ";
+                    }
+                }
+                else
+                {
+                    txtTest.Text = " ";
+                    while (speed.Count > 0)
+                    {
+                        speed.TryDequeue(out data);
+                    }
+                }
+
             }
 
         }
@@ -364,6 +447,12 @@ namespace EMGU_FACE_DETECTION
         {
             M2status = ON;
             sendMotorCommand(M2DOWN);
+        }
+
+        private void Timer2_Tick(object sender, EventArgs e)
+        {
+            timer_flag = true;
+            txtFire.Text = "FIRE";
         }
     }
 }
