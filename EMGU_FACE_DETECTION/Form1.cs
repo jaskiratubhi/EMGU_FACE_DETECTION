@@ -50,7 +50,7 @@ namespace EMGU_FACE_DETECTION
         int current_speed;
         int old_distance = 0;
         int frame_count = 0;
-        bool timer_flag = false;
+        bool timer_flag = true;
         const int FRAME_AVERAGE= 5;
         //Data packet
         // const int START_BYTE = 255;     //byte 1
@@ -97,9 +97,18 @@ namespace EMGU_FACE_DETECTION
 
         private void BtnDetect_Click(object sender, EventArgs e)
         {
+            
             device = new VideoCaptureDevice(filter[camDevice.SelectedIndex].MonikerString);
             device.NewFrame += Device_NewFrame;
-            device.Start();
+            if (device.IsRunning == false)
+            {
+                device.Start();
+            }
+            else if(device.IsRunning)
+            {
+                device.Stop();
+            }
+
         }
         static readonly CascadeClassifier cascadeClassifier = new CascadeClassifier("haarcascade_frontalface_default.xml");
         private void Device_NewFrame(object sender, NewFrameEventArgs eventArgs)
@@ -243,11 +252,29 @@ namespace EMGU_FACE_DETECTION
                     {
                         if (speed.Average() < SPEED_THRESHOLD)
                         {
-                            txtTest.Text = "Target Locked";
+                            if (timer_flag == true)
+                            {
+                                txtTest.Text = "Target Locked";
+                                if (xval <= Xcenter)
+                                {
+                                    //fire Left
+                                    sendMotorCommand(FIRERIGHTSOLENOID);
+
+                                }
+                                else if(xval>Xcenter)
+                                {
+                                    //Right
+                                    sendMotorCommand(FIRERIGHTSOLENOID);
+
+                                }
+                                timer2.Enabled = true;
+                                timer_flag = false;
+                            }
                            
                         }
                         else
                         {
+                            if(timer_flag==true)
                             txtTest.Text = " ";
                         }
                         while(speed.Count> FRAME_AVERAGE)
@@ -258,11 +285,13 @@ namespace EMGU_FACE_DETECTION
                     }
                     else
                     {
+                        if(timer_flag==true)
                         txtTest.Text = " ";
                     }
                 }
                 else
                 {
+                    if(timer_flag==true)
                     txtTest.Text = " ";
                     while (speed.Count > 0)
                     {
@@ -452,7 +481,8 @@ namespace EMGU_FACE_DETECTION
         private void Timer2_Tick(object sender, EventArgs e)
         {
             timer_flag = true;
-            txtFire.Text = "FIRE";
+            timer2.Enabled = false;
+           // txtFire.Text = "FIRE";
         }
     }
 }
