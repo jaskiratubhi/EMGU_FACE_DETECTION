@@ -34,6 +34,7 @@ namespace EMGU_FACE_DETECTION
         const int M2DOWN = 4;   //Motor 2, down
         const int FIRELEFTSOLENOID = 5;     //Fire Left Solenoid
         const int FIRERIGHTSOLENOID = 6;    //Fire Right Solenoid
+        const int SOLENOIDSOFF = 50;  // Turn off both Solenoid
         const int M1STOPPED = 7;   //Motor 1 on but stopped
         const int M2STOPPED = 8;   //Motor 2 on but stopped
         const int MOTORSOFF = 9;  //Emergency Power shutdown(Both Motors)
@@ -104,10 +105,7 @@ namespace EMGU_FACE_DETECTION
             {
                 device.Start();
             }
-            else if(device.IsRunning)
-            {
-                device.Stop();
-            }
+           
 
         }
         static readonly CascadeClassifier cascadeClassifier = new CascadeClassifier("haarcascade_frontalface_default.xml");
@@ -165,10 +163,13 @@ namespace EMGU_FACE_DETECTION
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
+            sendMotorCommand(MOTORSOFF);
+            sendMotorCommand(SOLENOIDSOFF);
+     
             if (device.IsRunning)
                 device.Stop();
             //Turn off solenoid
-            sendMotorCommand(MOTORSOFF);
+            
             serialPort1.Close();
         }
 
@@ -210,7 +211,7 @@ namespace EMGU_FACE_DETECTION
                 {
                     M1status = ON;
                     M2status = ON;
-                    sendMotorCommand(9);
+                    sendMotorCommand(M1STOPPED);
                 }
             }
             //Y movements
@@ -232,7 +233,7 @@ namespace EMGU_FACE_DETECTION
                 {
                     M1status = ON;
                     M2status = ON;
-                    sendMotorCommand(9);
+                    sendMotorCommand(M2STOPPED);
                 }
             }
             if (xval > 0 && yval > 0)
@@ -259,12 +260,14 @@ namespace EMGU_FACE_DETECTION
                                 {
                                     //fire Left
                                     sendMotorCommand(FIRERIGHTSOLENOID);
+                                    txtLeft.Text = "FIRE";
 
                                 }
                                 else if(xval>Xcenter)
                                 {
                                     //Right
                                     sendMotorCommand(FIRERIGHTSOLENOID);
+                                    txtRight.Text = "FIRE";
 
                                 }
                                 timer2.Enabled = true;
@@ -305,6 +308,8 @@ namespace EMGU_FACE_DETECTION
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
+            sendMotorCommand(SOLENOIDSOFF);
+            sendMotorCommand(MOTORSOFF);
             if (device.IsRunning)
                 device.Stop();
         }
@@ -342,7 +347,7 @@ namespace EMGU_FACE_DETECTION
             {
                 M1status = ON;
                 M2status = ON;
-                sendMotorCommand(M1STOPPED);
+                //sendMotorCommand(M1STOPPED);
                 //sendMotorCommand(1);              
                 //sendMotorCommand(M2STOPPED);
                 
@@ -482,7 +487,21 @@ namespace EMGU_FACE_DETECTION
         {
             timer_flag = true;
             timer2.Enabled = false;
-           // txtFire.Text = "FIRE";
+            sendMotorCommand(SOLENOIDSOFF);
+            txtLeft.Text = "";
+            txtRight.Text = "";
+            // txtFire.Text = "FIRE";
+        }
+
+        private void Button6_Click(object sender, EventArgs e)
+        {
+            if (device.IsRunning)
+            {
+                device.Stop();
+            }
+            sendMotorCommand(SOLENOIDSOFF);
+            sendMotorCommand(MOTORSOFF);
+
         }
     }
 }

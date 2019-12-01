@@ -66,7 +66,9 @@
             this.label6 = new System.Windows.Forms.Label();
             this.listBoxTest = new System.Windows.Forms.ListBox();
             this.timer2 = new System.Windows.Forms.Timer(this.components);
-            this.txtFire = new System.Windows.Forms.TextBox();
+            this.txtLeft = new System.Windows.Forms.TextBox();
+            this.button6 = new System.Windows.Forms.Button();
+            this.txtRight = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.videoFeed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.verticalPositionBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.horizontalPositionBar)).BeginInit();
@@ -217,7 +219,7 @@
             // 
             this.fireLeftbtn.Enabled = false;
             this.fireLeftbtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 22F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.fireLeftbtn.Location = new System.Drawing.Point(1127, 199);
+            this.fireLeftbtn.Location = new System.Drawing.Point(1127, 234);
             this.fireLeftbtn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.fireLeftbtn.Name = "fireLeftbtn";
             this.fireLeftbtn.Size = new System.Drawing.Size(172, 114);
@@ -427,20 +429,41 @@
             this.timer2.Interval = 2000;
             this.timer2.Tick += new System.EventHandler(this.Timer2_Tick);
             // 
-            // txtFire
+            // txtLeft
             // 
-            this.txtFire.Font = new System.Drawing.Font("Consolas", 22.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtFire.Location = new System.Drawing.Point(928, 682);
-            this.txtFire.Name = "txtFire";
-            this.txtFire.Size = new System.Drawing.Size(100, 51);
-            this.txtFire.TabIndex = 56;
+            this.txtLeft.Font = new System.Drawing.Font("Consolas", 22.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtLeft.Location = new System.Drawing.Point(774, 672);
+            this.txtLeft.Name = "txtLeft";
+            this.txtLeft.Size = new System.Drawing.Size(100, 51);
+            this.txtLeft.TabIndex = 56;
+            // 
+            // button6
+            // 
+            this.button6.Font = new System.Drawing.Font("Consolas", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button6.Location = new System.Drawing.Point(1246, 142);
+            this.button6.Name = "button6";
+            this.button6.Size = new System.Drawing.Size(108, 67);
+            this.button6.TabIndex = 57;
+            this.button6.Text = "Stop Camera";
+            this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.Button6_Click);
+            // 
+            // txtRight
+            // 
+            this.txtRight.Font = new System.Drawing.Font("Consolas", 22.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtRight.Location = new System.Drawing.Point(923, 672);
+            this.txtRight.Name = "txtRight";
+            this.txtRight.Size = new System.Drawing.Size(100, 51);
+            this.txtRight.TabIndex = 58;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1767, 784);
-            this.Controls.Add(this.txtFire);
+            this.Controls.Add(this.txtRight);
+            this.Controls.Add(this.button6);
+            this.Controls.Add(this.txtLeft);
             this.Controls.Add(this.listBoxTest);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label5);
@@ -527,7 +550,9 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.ListBox listBoxTest;
         private System.Windows.Forms.Timer timer2;
-        private System.Windows.Forms.TextBox txtFire;
+        private System.Windows.Forms.TextBox txtLeft;
+        private System.Windows.Forms.Button button6;
+        private System.Windows.Forms.TextBox txtRight;
     }
 }
 
