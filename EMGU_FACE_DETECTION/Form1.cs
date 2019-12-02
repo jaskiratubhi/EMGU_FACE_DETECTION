@@ -52,7 +52,7 @@ namespace EMGU_FACE_DETECTION
         int old_distance = 0;
         int frame_count = 0;
         bool timer_flag = true;
-        const int FRAME_AVERAGE= 5;
+        const int FRAME_AVERAGE= 3;
         //Data packet
         // const int START_BYTE = 255;     //byte 1
         // int commandByte = 0;            //byte 2
@@ -259,7 +259,7 @@ namespace EMGU_FACE_DETECTION
                                 if (xval <= Xcenter)
                                 {
                                     //fire Left
-                                    sendMotorCommand(FIRERIGHTSOLENOID);
+                                    sendMotorCommand(FIRELEFTSOLENOID);
                                     txtLeft.Text = "FIRE";
 
                                 }
