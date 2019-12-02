@@ -1,4 +1,9 @@
-﻿using System;
+﻿//Mech 423 Final Project
+//Jaskirat Ubhi
+//Alice Zheng
+//Kelvin Po
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
